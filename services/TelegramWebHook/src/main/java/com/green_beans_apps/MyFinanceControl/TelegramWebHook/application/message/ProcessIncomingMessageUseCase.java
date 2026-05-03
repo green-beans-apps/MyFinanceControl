@@ -3,5 +3,5 @@ package com.green_beans_apps.MyFinanceControl.TelegramWebHook.application.messag
 import com.green_beans_apps.MyFinanceControl.TelegramWebHook.domain.message.Message;
 
 public interface ProcessIncomingMessageUseCase {
-    public void execute(Message message);
+    public void execute(Message message) throws IllegalArgumentException;
 }

@@ -12,7 +12,8 @@ public class ProcessIncomingMessageService implements ProcessIncomingMessageUseC
     }
 
     @Override
-    public void execute(Message message) {
-        // TODO: Implementar aqui
+    public void execute(Message message) throws IllegalArgumentException {
+        message.validate();
+        publisher.publish(message);
     }
 }

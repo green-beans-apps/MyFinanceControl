@@ -22,6 +22,29 @@ public class Message {
         this.lastName = lastName;
     }
 
+    public void validate() throws IllegalArgumentException {
+
+        if (messageId == null || messageId.isBlank()) {
+            throw new IllegalArgumentException("messageId é obrigatório");
+        }
+
+        if (userId == null || userId.isBlank()) {
+            throw new IllegalArgumentException("userId é obrigatório");
+        }
+
+        if (text == null || text.isBlank()) {
+            throw new IllegalArgumentException("text não pode ser vazio");
+        }
+
+        if (timestamp == null) {
+            throw new IllegalArgumentException("timestamp é obrigatório");
+        }
+
+        if (text.length() > 1000) {
+            throw new IllegalArgumentException("text muito longo");
+        }
+    }
+
     public String getMessageId() {
         return messageId;
     }
