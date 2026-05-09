@@ -2,17 +2,22 @@ package com.green_beans_apps.MyFinanceControl.FinanceProcessor.application;
 
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.ports.FinancialCommandPublisher;
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.ports.FinancialMessageInterpreter;
+import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.ports.FinancialNotificationPublisher;
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.command.FinancialCommand;
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.message.Message;
+import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.message.MessageInterpretationException;
+import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.notification.Notification;
 
 public class ProcessFinancialMessageService implements ProcessFinancialMessageUseCase {
 
     private FinancialMessageInterpreter financialMessageInterpreter;
     private FinancialCommandPublisher financialCommandPublisher;
+    private FinancialNotificationPublisher financialNotificationPublisher;
 
-    public ProcessFinancialMessageService(FinancialMessageInterpreter financialMessageInterpreter, FinancialCommandPublisher financialCommandPublisher) {
+    public ProcessFinancialMessageService(FinancialMessageInterpreter financialMessageInterpreter, FinancialCommandPublisher financialCommandPublisher, FinancialNotificationPublisher financialNotificationPublisher) {
         this.financialMessageInterpreter = financialMessageInterpreter;
         this.financialCommandPublisher = financialCommandPublisher;
+        this.financialNotificationPublisher = financialNotificationPublisher;
     }
 
     @Override
@@ -25,9 +30,10 @@ public class ProcessFinancialMessageService implements ProcessFinancialMessageUs
             System.out.println("Descricao: " + financialCommand.getDescription());
             System.out.println("Operacao: " + financialCommand.getType().name());
             financialCommandPublisher.publish(financialCommand);
-        } catch (IllegalArgumentException e) {
-            // TODO: politica de envio de mensagem avisando o usuario que a mensagem não foi entendida
+        } catch (MessageInterpretationException e) {
             System.err.println("Erro ao interpretar mensagem: " + e.getMessage());
+            Notification notification = new Notification(Integer.valueOf(message.getUserId()), e.getMessage());
+            financialNotificationPublisher.publish(notification);
         }
     }
 }

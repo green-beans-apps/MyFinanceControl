@@ -21,12 +21,16 @@ public class RabbitMQConfig {
 
     public static final String COMMAND_QUEUE = "finance.command";
     public static final String COMMAND_ROUTING_KEY = "finance.command";
+
+    public static final String NOTIFICATION_QUEUE = "finance.notification";
+    public static final String NOTIFICATION_ROUTING_KEY = "finance.notification";
+
     @Bean
     public TopicExchange exchange() {
         return new TopicExchange(EXCHANGE);
     }
 
-    // Configurando fila de de mensagens
+    // Configurando fila de mensagens
     @Bean
     public Queue messageQueue() {
         return new Queue(MESSAGE_QUEUE, true); // durable
@@ -52,6 +56,20 @@ public class RabbitMQConfig {
                 .bind(commandQueue())
                 .to(exchange())
                 .with(COMMAND_ROUTING_KEY);
+    }
+
+    // Configurando fila de notificacao
+    @Bean
+    public Queue notificationQueue(){
+        return new Queue(NOTIFICATION_QUEUE, true);
+    }
+
+    @Bean
+    public Binding notificationBinding(){
+        return BindingBuilder
+                .bind(notificationQueue())
+                .to(exchange())
+                .with(NOTIFICATION_ROUTING_KEY);
     }
 
     @Bean
