@@ -16,7 +16,8 @@ public class FinancialCommand {
     public FinancialCommand() {
     }
 
-    public FinancialCommand(CommandType type, BigDecimal amount, String description, String userId, Instant timestamp) {
+    public FinancialCommand(Integer id, CommandType type, BigDecimal amount, String description, String userId, Instant timestamp) {
+        this.id = id;
         this.type = type;
         this.amount = amount;
         this.description = description;

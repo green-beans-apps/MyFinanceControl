@@ -1,4 +1,4 @@
-package com.green_beans_apps.MyFinanceControl.TelegramWebHook.infrastructure;
+package com.green_beans_apps.MyFinanceControl.FinanceProcessor.infrastructure;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -6,34 +6,52 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.amqp.support.converter.MessageConverter;
 
 @Configuration
 public class RabbitMQConfig {
 
     public static final String EXCHANGE = "finance.exchange";
-    public static final String QUEUE = "finance.message";
-    public static final String ROUTING_KEY = "finance.message";
 
+    public static final String MESSAGE_QUEUE = "finance.message";
+    public static final String MESSAGE_ROUTING_KEY = "finance.message";
+
+    public static final String COMMAND_QUEUE = "finance.command";
+    public static final String COMMAND_ROUTING_KEY = "finance.command";
     @Bean
     public TopicExchange exchange() {
         return new TopicExchange(EXCHANGE);
     }
 
+    // Configurando fila de de mensagens
     @Bean
-    public Queue queue() {
-        return new Queue(QUEUE, true); // durable
+    public Queue messageQueue() {
+        return new Queue(MESSAGE_QUEUE, true); // durable
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
+    public Binding messageBinding() {
         return BindingBuilder
-                .bind(queue)
-                .to(exchange)
-                .with(ROUTING_KEY);
+                .bind(messageQueue())
+                .to(exchange())
+                .with(MESSAGE_ROUTING_KEY);
+    }
+
+    // Configurando fila de comandos
+    @Bean
+    public Queue commandQueue() {
+        return new Queue(COMMAND_QUEUE, true); // durable
+    }
+
+    @Bean
+    public Binding commandBinding() {
+        return BindingBuilder
+                .bind(commandQueue())
+                .to(exchange())
+                .with(COMMAND_ROUTING_KEY);
     }
 
     @Bean

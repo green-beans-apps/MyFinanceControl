@@ -17,8 +17,17 @@ public class ProcessFinancialMessageService implements ProcessFinancialMessageUs
 
     @Override
     public void execute(Message message) {
-        FinancialCommand financialCommand = financialMessageInterpreter.interpretMessage(message);
-        System.out.println("Processing financial message: " + financialCommand.getAmount());
-        financialCommandPublisher.publish(financialCommand);
+        try {
+            FinancialCommand financialCommand = financialMessageInterpreter.interpretMessage(message);
+
+            System.out.println("Valor: " + financialCommand.getAmount());
+            System.out.println("User id: " + financialCommand.getUserId());
+            System.out.println("Descricao: " + financialCommand.getDescription());
+            System.out.println("Operacao: " + financialCommand.getType().name());
+            financialCommandPublisher.publish(financialCommand);
+        } catch (IllegalArgumentException e) {
+            // TODO: politica de envio de mensagem avisando o usuario que a mensagem não foi entendida
+            System.err.println("Erro ao interpretar mensagem: " + e.getMessage());
+        }
     }
 }

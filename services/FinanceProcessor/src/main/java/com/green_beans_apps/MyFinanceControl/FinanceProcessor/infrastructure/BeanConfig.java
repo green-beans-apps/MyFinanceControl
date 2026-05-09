@@ -6,6 +6,7 @@ import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.Proces
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.ProcessFinancialMessageUseCase;
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.ports.FinancialCommandPublisher;
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.ports.FinancialMessageInterpreter;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,7 +24,7 @@ public class BeanConfig {
     }
 
      @Bean
-    public FinancialCommandPublisher financialCommandPublisher() {
-        return new RabbitmqFinancialCommandPublisher();
+    public FinancialCommandPublisher financialCommandPublisher(RabbitTemplate rabbitTemplate) {
+        return new RabbitmqFinancialCommandPublisher(rabbitTemplate);
      }
 }
