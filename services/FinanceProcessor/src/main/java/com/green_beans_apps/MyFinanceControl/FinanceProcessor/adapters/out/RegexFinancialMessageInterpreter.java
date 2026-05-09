@@ -4,6 +4,7 @@ import com.green_beans_apps.MyFinanceControl.FinanceProcessor.application.ports.
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.command.CommandType;
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.command.FinancialCommand;
 import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.message.Message;
+import com.green_beans_apps.MyFinanceControl.FinanceProcessor.domain.message.MessageInterpretationException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,7 +36,7 @@ public class RegexFinancialMessageInterpreter implements FinancialMessageInterpr
         BigDecimal amount = extractAmount(normalized);
         String description = extractDescription(normalized, amount);
 
-        validateAmountForType(type, amount);
+        validateAmountForType(type, amount, message.getText());
 
         return new FinancialCommand(
                 Integer.valueOf(message.getMessageId()),
@@ -61,9 +62,9 @@ public class RegexFinancialMessageInterpreter implements FinancialMessageInterpr
         if (containsAny(text, EXPENSE_KEYWORDS)) return CommandType.EXPENSE;
         if (containsAny(text, INCOME_KEYWORDS))  return CommandType.INCOME;
 
-        throw new IllegalArgumentException(
-                "Não entendi o tipo da operação. Use palavras como: " +
-                        "'gastei', 'recebi', 'paguei', 'saldo', etc."
+        throw new MessageInterpretationException(
+                "Não entendi o tipo da operação. Use: 'gastei', 'recebi', 'paguei', 'saldo'...",
+                text
         );
     }
 
@@ -109,17 +110,21 @@ public class RegexFinancialMessageInterpreter implements FinancialMessageInterpr
         return null;
     }
 
-    private void validateAmountForType(CommandType type, BigDecimal amount) {
-        if (type == CommandType.BALANCE) return; // BALANCE não precisa de valor
+    private void validateAmountForType(CommandType type, BigDecimal amount, String originalText) {
+        if (type == CommandType.BALANCE) return;
 
         if (amount == null) {
-            throw new IllegalArgumentException(
-                    "Não encontrei um valor na mensagem. Ex: 'gastei 50 no mercado'"
+            throw new MessageInterpretationException(
+                    "Não encontrei um valor na mensagem. Ex: 'gastei 50 no mercado'",
+                    originalText
             );
         }
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("O valor deve ser maior que zero.");
+            throw new MessageInterpretationException(
+                    "O valor deve ser maior que zero.",
+                    originalText
+            );
         }
     }
 
